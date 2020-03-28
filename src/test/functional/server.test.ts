@@ -4,7 +4,7 @@ import { get, GetResponse } from '../../core/http';
 import { Server } from '../../core/server';
 
 import { Binding, KitchenSinkWhereInput } from '../generated/binding';
-import { KitchenSink, StringEnum } from '../modules';
+import { KitchenSink, StringEnum, Dish } from '../modules';
 import { setTestServerEnvironmentVariables } from '../server-vars';
 import { getTestServer } from '../test-server';
 
@@ -13,13 +13,15 @@ import { KITCHEN_SINKS } from './fixtures';
 import express = require('express');
 import * as request from 'supertest';
 
+const runKey = new Date().getTime(); // used to ensure test runs create unique data
 let server: Server<any>;
 // Can't type this as Binding as TypeScript will do static analysis and bomb if any new fields are introduced
-let binding: any; // Binding;
+let binding: Binding;
 let customExpressApp: express.Application;
 
 let onBeforeCalled = false;
 let onAfterCalled = false;
+let kitchenSink: KitchenSink;
 
 describe('server', () => {
   beforeEach(() => {
@@ -58,7 +60,7 @@ describe('server', () => {
       throw new Error(error);
     }
 
-    const kitchenSink = await createKitchenSink(binding, 'hi@warthog.com');
+    kitchenSink = await createKitchenSink(binding, 'hi@warthog.com');
     await createManyDishes(binding, kitchenSink.id);
     await createManyKitchenSinks(binding);
 
@@ -456,6 +458,48 @@ describe('server', () => {
     expect(response.status).toEqual(200);
     expect(response.body).toEqual({ bar: 'baz' });
     noSupertestRequestErrors(response);
+  });
+
+  describe('Transactions', () => {
+    test('create two dishes in transaction successfully', async done => {
+      expect.assertions(3);
+      const name = `Tx Success ${runKey}`;
+
+      const users = await binding.mutation.createTwoTransactionSuccess(
+        { data: { name, kitchenSinkId: kitchenSink.id } },
+        `{ id name }`
+      );
+
+      expect(users[0]).toBeDefined();
+      expect(users[1]).toBeDefined();
+
+      const savedDishes = await binding.query.dishes({ where: { name_eq: name } }, '{ id }');
+      expect(savedDishes.length).toEqual(2);
+      done();
+    });
+
+    test('failed transaction should not save any items', async done => {
+      expect.assertions(1);
+      const name = `Tx Fail ${runKey}`;
+
+      try {
+        await binding.mutation.createTwoTransactionFail(
+          { data: { name, kitchenSinkId: kitchenSink.id } },
+          `{ id name }`
+        );
+      } catch (err) {
+        // Swallow the error - we'll check whether anything was saved below
+      }
+
+      let savedDishes: Dish[] = [];
+      try {
+        savedDishes = await binding.query.dishes({ where: { name_eq: name } }, '{ id }');
+      } catch (error) {
+        console.log('This should not have errored', savedDishes);
+      }
+      expect(savedDishes.length).toEqual(0);
+      done();
+    });
   });
 });
 

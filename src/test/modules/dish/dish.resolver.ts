@@ -83,4 +83,20 @@ export class DishResolver {
   ): Promise<StandardDeleteResponse> {
     return this.service.delete(where, userId);
   }
+
+  @Mutation(() => [Dish])
+  async createTwoTransactionSuccess(
+    @Arg('data') data: DishCreateInput,
+    @Ctx() ctx: BaseContext
+  ): Promise<Dish[]> {
+    return this.service.createTwoTransactionSuccess(data, ctx.user.id);
+  }
+
+  @Mutation(() => [Dish])
+  async createTwoTransactionFail(
+    @Arg('data') data: DishCreateInput,
+    @Ctx() ctx: BaseContext
+  ): Promise<Dish[]> {
+    return this.service.createTwoTransactionFail(data, ctx.user.id);
+  }
 }
