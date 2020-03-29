@@ -2,7 +2,6 @@ import { GraphQLBoolean } from 'graphql';
 import { Field } from 'type-graphql';
 import { Column } from 'typeorm';
 
-import { decoratorDefaults } from '../metadata';
 import { composeMethodDecorators, MethodDecoratorFactory } from '../utils';
 
 import { WarthogField } from './WarthogField';
@@ -16,7 +15,7 @@ interface BooleanFieldOptions {
 }
 
 export function BooleanField(args: BooleanFieldOptions = {}): any {
-  const options = { ...decoratorDefaults, ...args };
+  const options = { ...args };
   const nullableOption = options.nullable === true ? { nullable: true } : {};
   const defaultOption =
     options.default === true || options.default === false ? { default: options.default } : {};

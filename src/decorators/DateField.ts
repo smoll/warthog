@@ -1,7 +1,6 @@
 import { Field, GraphQLISODateTime } from 'type-graphql';
 import { Column } from 'typeorm';
 
-import { decoratorDefaults } from '../metadata';
 import { ColumnType, defaultColumnType } from '../torm';
 import { composeMethodDecorators, MethodDecoratorFactory } from '../utils';
 
@@ -16,7 +15,7 @@ interface DateFieldOptions {
 }
 
 export function DateField(args: DateFieldOptions = {}): any {
-  const options = { ...decoratorDefaults, ...args };
+  const options = { ...args };
   const nullableOption = options.nullable === true ? { nullable: true } : {};
   const defaultOption = options.default ? { default: options.default } : {};
   const databaseConnection: string = process.env.WARTHOG_DB_CONNECTION || '';

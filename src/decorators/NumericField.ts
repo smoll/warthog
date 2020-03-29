@@ -3,7 +3,6 @@ import { Column } from 'typeorm';
 import { ColumnNumericOptions } from 'typeorm/decorator/options/ColumnNumericOptions';
 import { ColumnCommonOptions } from 'typeorm/decorator/options/ColumnCommonOptions';
 
-import { decoratorDefaults } from '../metadata';
 import { composeMethodDecorators, MethodDecoratorFactory } from '../utils';
 import { NumericColumnType } from '../torm';
 
@@ -16,9 +15,9 @@ interface NumericFieldOptions extends ColumnCommonOptions, ColumnNumericOptions 
   sort?: boolean;
 }
 
-export function NumericField(args: NumericFieldOptions = decoratorDefaults): any {
+export function NumericField(args: NumericFieldOptions = {}): any {
   const { dataType, filter, sort, ...dbOptions } = args;
-  const options = { ...decoratorDefaults, ...args };
+  const options = { ...args };
 
   const nullableOption = options.nullable === true ? { nullable: true } : {};
 

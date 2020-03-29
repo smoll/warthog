@@ -1,5 +1,8 @@
 import { GraphQLEnumType } from 'graphql';
+import { Inject } from 'typedi';
+
 import { ColumnType } from '../torm';
+import { Config } from '../core/';
 
 export type FieldType =
   | 'boolean'
@@ -13,19 +16,12 @@ export type FieldType =
   | 'numeric'
   | 'string';
 
-export const decoratorDefaults = {
-  editable: true,
-  filter: true,
-  nullable: false,
-  sort: true
-};
-
 export interface ColumnMetadata {
   type: FieldType;
   propertyName: string;
   dataType?: ColumnType; // int16, jsonb, etc...
   editable?: boolean;
-  filter?: boolean | FieldType;
+  filter?: boolean;
   enum?: GraphQLEnumType;
   enumName?: string;
   nullable?: boolean;
@@ -48,80 +44,99 @@ export class MetadataStorage {
   classMap: { [table: string]: any } = {};
   models: { [table: string]: ModelMetadata } = {};
   interfaces: string[] = [];
-  baseColumns: ColumnMetadata[] = [
-    {
-      propertyName: 'id',
-      type: 'id',
-      filter: true,
+  baseColumns: ColumnMetadata[];
+
+  decoratorDefaults: Partial<ColumnMetadata>;
+
+  constructor(@Inject('Config') readonly config?: Config) {
+    config = this.config as Config;
+
+    console.log('process.env.WARTHOG_FILTER_BY_DEFAULT', process.env.WARTHOG_FILTER_BY_DEFAULT);
+
+    this.decoratorDefaults = {
+      editable: true,
+      // `true` by default, provide opt-out for backward compatability
+      // V3: make this false by default
+      filter: process.env.WARTHOG_FILTER_BY_DEFAULT !== 'false' ?? true,
       nullable: false,
-      sort: false,
-      unique: true,
-      editable: false
-    },
-    {
-      propertyName: 'createdAt',
-      type: 'date',
-      editable: false,
-      filter: true,
-      nullable: false,
-      sort: true,
-      unique: false
-    },
-    {
-      propertyName: 'createdById',
-      type: 'id',
-      editable: false,
-      filter: true,
-      nullable: false,
-      sort: false,
-      unique: false
-    },
-    {
-      propertyName: 'updatedAt',
-      type: 'date',
-      editable: false,
-      filter: true,
-      nullable: true,
-      sort: true,
-      unique: false
-    },
-    {
-      propertyName: 'updatedById',
-      type: 'id',
-      editable: false,
-      filter: true,
-      nullable: true,
-      sort: false,
-      unique: false
-    },
-    {
-      propertyName: 'deletedAt',
-      type: 'date',
-      editable: false,
-      filter: true,
-      nullable: true,
-      sort: true,
-      unique: false
-    },
-    {
-      propertyName: 'deletedById',
-      type: 'id',
-      editable: false,
-      filter: true,
-      nullable: true,
-      sort: false,
-      unique: false
-    },
-    {
-      type: 'integer',
-      propertyName: 'version',
-      editable: false,
-      filter: false,
-      nullable: false,
-      sort: false,
-      unique: false
-    }
-  ];
+      sort: process.env.WARTHOG_FILTER_BY_DEFAULT !== 'false' ?? true
+    };
+
+    this.baseColumns = [
+      {
+        propertyName: 'id',
+        type: 'id',
+        filter: true,
+        nullable: false,
+        sort: false,
+        unique: true,
+        editable: false
+      },
+      {
+        propertyName: 'createdAt',
+        type: 'date',
+        editable: false,
+        filter: true,
+        nullable: false,
+        sort: true,
+        unique: false
+      },
+      {
+        propertyName: 'createdById',
+        type: 'id',
+        editable: false,
+        filter: true,
+        nullable: false,
+        sort: false,
+        unique: false
+      },
+      {
+        propertyName: 'updatedAt',
+        type: 'date',
+        editable: false,
+        filter: true,
+        nullable: true,
+        sort: true,
+        unique: false
+      },
+      {
+        propertyName: 'updatedById',
+        type: 'id',
+        editable: false,
+        filter: true,
+        nullable: true,
+        sort: false,
+        unique: false
+      },
+      {
+        propertyName: 'deletedAt',
+        type: 'date',
+        editable: false,
+        filter: true,
+        nullable: true,
+        sort: true,
+        unique: false
+      },
+      {
+        propertyName: 'deletedById',
+        type: 'id',
+        editable: false,
+        filter: true,
+        nullable: true,
+        sort: false,
+        unique: false
+      },
+      {
+        type: 'integer',
+        propertyName: 'version',
+        editable: false,
+        filter: false,
+        nullable: false,
+        sort: false,
+        unique: false
+      }
+    ];
+  }
 
   addModel(name: string, klass: any, filename: string, options = {}) {
     if (this.interfaces.indexOf(name) > -1) {
@@ -199,6 +214,7 @@ export class MetadataStorage {
     this.models[modelName].columns.push({
       type,
       propertyName: columnName,
+      ...this.decoratorDefaults,
       ...options
     });
   }

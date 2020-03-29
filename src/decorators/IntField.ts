@@ -1,7 +1,6 @@
 import { Field, Int } from 'type-graphql';
 import { Column } from 'typeorm';
 
-import { decoratorDefaults } from '../metadata';
 import { composeMethodDecorators, MethodDecoratorFactory } from '../utils';
 import { IntColumnType } from '../torm';
 
@@ -15,8 +14,8 @@ interface IntFieldOptions {
   sort?: boolean;
 }
 
-export function IntField(args: IntFieldOptions = decoratorDefaults): any {
-  const options = { ...decoratorDefaults, ...args };
+export function IntField(args: IntFieldOptions = {}): any {
+  const options = { ...args };
   const defaultOption = options.default ? { default: options.default } : {};
   const nullableOption = options.nullable === true ? { nullable: true } : {};
 

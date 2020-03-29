@@ -3,7 +3,6 @@ import { MaxLength, MinLength } from 'class-validator';
 import { Field } from 'type-graphql';
 import { Column } from 'typeorm';
 
-import { FieldType, decoratorDefaults } from '../metadata';
 import { composeMethodDecorators, MethodDecoratorFactory } from '../utils';
 import { StringColumnType } from '../torm';
 
@@ -13,15 +12,15 @@ interface StringFieldOptions {
   dataType?: StringColumnType; // int16, jsonb, etc...
   maxLength?: number;
   minLength?: number;
-  filter?: boolean | FieldType;
+  filter?: boolean;
   nullable?: boolean;
   sort?: boolean;
   unique?: boolean;
   editable?: boolean;
 }
 
-export function StringField(args: StringFieldOptions = decoratorDefaults): any {
-  const options = { ...decoratorDefaults, ...args };
+export function StringField(args: StringFieldOptions = {}): any {
+  const options = { ...args };
   const nullableOption = options.nullable === true ? { nullable: true } : {};
   const maxLenOption = options.maxLength ? { length: options.maxLength } : {};
   const uniqueOption = options.unique ? { unique: true } : {};

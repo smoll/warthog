@@ -4,7 +4,6 @@ const { GraphQLJSONObject } = require('graphql-type-json');
 import { Field } from 'type-graphql';
 import { Column } from 'typeorm';
 
-import { decoratorDefaults } from '../metadata';
 import { defaultColumnType } from '../torm';
 import { composeMethodDecorators, MethodDecoratorFactory } from '../utils';
 
@@ -16,7 +15,7 @@ interface JSONFieldOptions {
 }
 
 export function JSONField(args: JSONFieldOptions = {}): any {
-  const options = { ...decoratorDefaults, ...args };
+  const options = { ...args };
   const databaseConnection: string = process.env.WARTHOG_DB_CONNECTION || '';
   const type = defaultColumnType(databaseConnection, 'json');
 

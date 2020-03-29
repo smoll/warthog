@@ -1,7 +1,6 @@
 import { Field } from 'type-graphql';
 import { Column } from 'typeorm';
 
-import { decoratorDefaults } from '../metadata';
 import { composeMethodDecorators, MethodDecoratorFactory } from '../utils';
 
 import { WarthogField } from './WarthogField';
@@ -13,8 +12,8 @@ interface StringFieldOptions {
   unique?: boolean;
 }
 
-export function IdField(args: StringFieldOptions = decoratorDefaults): any {
-  const options = { ...decoratorDefaults, ...args };
+export function IdField(args: StringFieldOptions = {}): any {
+  const options = { ...args };
   const nullableOption = options.nullable === true ? { nullable: true } : {};
   const uniqueOption = options.unique ? { unique: true } : {};
 

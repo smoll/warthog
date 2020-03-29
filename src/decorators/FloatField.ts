@@ -1,7 +1,6 @@
 import { Field, Float } from 'type-graphql';
 import { Column } from 'typeorm';
 
-import { decoratorDefaults } from '../metadata';
 import { composeMethodDecorators, MethodDecoratorFactory } from '../utils';
 import { FloatColumnType, defaultColumnType } from '../torm';
 
@@ -15,8 +14,8 @@ interface FloatFieldOptions {
   sort?: boolean;
 }
 
-export function FloatField(args: FloatFieldOptions = decoratorDefaults): any {
-  const options = { ...decoratorDefaults, ...args };
+export function FloatField(args: FloatFieldOptions = {}): any {
+  const options = { ...args };
   const nullableOption = options.nullable === true ? { nullable: true } : {};
   const defaultOption = options.default ? { default: options.default } : {};
   const databaseConnection: string = process.env.WARTHOG_DB_CONNECTION || '';
