@@ -3,7 +3,7 @@ import { build } from 'gluegun';
 /**
  * Create the cli and kick it off
  */
-export async function run(argv: string[]) {
+export async function run(argv: string[]): Promise<any> {
   // create a CLI runtime
   const cli = build()
     .brand('warthog')

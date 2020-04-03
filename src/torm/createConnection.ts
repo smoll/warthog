@@ -29,7 +29,9 @@ export function getBaseConfig() {
 
 // Note: all DB options should be specified by environment variables
 // Either using TYPEORM_<variable> or WARTHOG_DB_<variable>
-export const createDBConnection = async (dbOptions: Partial<ConnectionOptions> = {}) => {
+export const createDBConnection = async (
+  dbOptions: Partial<ConnectionOptions> = {}
+): Promise<any> => {
   const config = {
     ...getBaseConfig(),
     ...dbOptions

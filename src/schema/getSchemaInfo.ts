@@ -7,7 +7,7 @@ import {
 } from 'graphql';
 import { buildSchema, BuildSchemaOptions } from 'type-graphql';
 
-export async function getSchemaInfo(options: BuildSchemaOptions) {
+export async function getSchemaInfo(options: BuildSchemaOptions): Promise<any> {
   // build schema from definitions
   const schema = await buildSchema(options);
 
