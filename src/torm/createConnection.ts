@@ -29,9 +29,7 @@ export function getBaseConfig() {
 
 // Note: all DB options should be specified by environment variables
 // Either using TYPEORM_<variable> or WARTHOG_DB_<variable>
-export const createDBConnection = async (
-  dbOptions: Partial<ConnectionOptions> = {}
-): Promise<any> => {
+export async function createDBConnection(dbOptions: Partial<ConnectionOptions> = {}): Promise<any> {
   const config = {
     ...getBaseConfig(),
     ...dbOptions
@@ -44,7 +42,7 @@ export const createDBConnection = async (
   logger.debug('createDBConnection', config);
 
   return createConnection(config as any); // TODO: fix any.  It is complaining about `type`
-};
+}
 
 function getDatabaseEntityPaths(): string[] {
   return process.env.WARTHOG_DB_ENTITIES
